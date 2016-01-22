@@ -1,7 +1,5 @@
 package com.proximus.mmgr.hive.metastore;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 
 import org.apache.hadoop.hive.metastore.api.StorageDescriptor;
@@ -17,12 +15,11 @@ import com.proximus.mmgr.ElementWritable;
  */
 public class TableElement extends Element implements ElementWritable {
 	public static final String TABLE_ELEMENT_TYPE = "TBL";
-	public static final String DATABASE_DEFAULT_PARENT = "";
 	
 	private Table table;
 	
 	/**
-	 * The ordered list of a Database attributes
+	 * The ordered list of a Table attributes
 	 */
 	private enum _HEADER {
 		type,id,name,description,parent,tableType,locationUri,ownerName,
@@ -41,7 +38,7 @@ public class TableElement extends Element implements ElementWritable {
 	}
 	
 	/**
-	 * @return a formated string of the Table attributes name separated by the specified separator.
+	 * @return a formated string of the Table attributes name separated by the object separator.
 	 */
 	public String getHeader() {
 		StringBuilder header = new StringBuilder();
@@ -53,6 +50,9 @@ public class TableElement extends Element implements ElementWritable {
 		return	header.substring(0, header.length() -1);
 	}
 
+	/**
+	 * @return a formated string of the Table values separated by the object separator.
+	 */
 	@Override
 	public String getRecord() {
 		ArrayList<String> attributes = new ArrayList<String>();
@@ -66,18 +66,6 @@ public class TableElement extends Element implements ElementWritable {
 		attributes.add(table.getViewExpandedText());
 		
 		return super.formatRecord(attributes);
-	}
-
-	@Override
-	public void writeRecord(BufferedWriter buffer) throws IOException {
-		buffer.write(getRecord());
-		buffer.newLine();
-	}
-
-	@Override
-	public void writeHeader(BufferedWriter buffer) throws IOException {
-		buffer.write(getHeader());
-		buffer.newLine();
 	}
 
 }

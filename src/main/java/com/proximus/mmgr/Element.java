@@ -173,7 +173,7 @@ public class Element implements ElementWritable {
 	}
 	
 	/**
-	 * @return a formated string of the Element attributes name separated by the specified separator.
+	 * @return a formated string of the Element attributes name separated by the object separator.
 	 */
 	public String getHeader() {
 		StringBuilder header = new StringBuilder();
@@ -186,7 +186,7 @@ public class Element implements ElementWritable {
 	}
 	
 	/**
-	 * @return a formated string of the Element values separated by the specified separator.
+	 * @return a formated string of the Element values separated by the object separator.
 	 */
 	public String getRecord() {
 		ArrayList<String> attributes = new ArrayList<String>();
@@ -205,7 +205,7 @@ public class Element implements ElementWritable {
 	 */
 	@Override
 	public void writeRecord(BufferedWriter buffer) throws IOException {		
-		buffer.write(this.getRecord());
+		buffer.write(getRecord());
 		buffer.newLine();
 	}
 
@@ -214,7 +214,7 @@ public class Element implements ElementWritable {
 	 */
 	@Override
 	public void writeHeader(BufferedWriter buffer) throws IOException {
-		buffer.write(this.getHeader());
+		buffer.write(getHeader());
 		buffer.newLine();
 	}
 }

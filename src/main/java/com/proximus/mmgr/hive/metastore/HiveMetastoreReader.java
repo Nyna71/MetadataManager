@@ -9,8 +9,11 @@ import java.util.List;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
+import org.apache.hadoop.hive.metastore.api.FieldSchema;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.api.NoSuchObjectException;
+import org.apache.hadoop.hive.metastore.api.StorageDescriptor;
+import org.apache.hadoop.hive.metastore.api.Table;
 import org.apache.thrift.TException;
 
 public class HiveMetastoreReader {
@@ -20,7 +23,7 @@ public class HiveMetastoreReader {
 	{
 		if(!System.getenv().containsKey("HIVE_HOME"))
 		{
-			System.out.println("HIVE_HOME is missing. Please set HIVE_HOME folder location");
+			System.out.println("HIVE_HOME variable is required. Please set HIVE_HOME folder location.");
 			System.exit(1);
 		}
 		System.out.println("Output file: " + args[0]);
@@ -52,7 +55,7 @@ public class HiveMetastoreReader {
 		HiveConf hiveConf = new HiveConf();
 		String hiveHome = System.getenv("HIVE_HOME");
 		Path hiveSite = new Path(hiveHome + HIVE_SITE);
-		System.out.println("hiveStite: " + hiveSite);
+		System.out.println("hiveSite: " + hiveSite);
 		
 		hiveConf.addResource(hiveSite);
         hiveConf.setVar(HiveConf.ConfVars.METASTORE_CONNECTION_USER_NAME, "id922010");
@@ -60,47 +63,51 @@ public class HiveMetastoreReader {
         return hiveConf;
 	}
 
-	/**
-	 * Exports Hive Metastore table's Metadata for a given Database. Following Table's Metadata is being exported:
-	 * <br>- TABLE_NAME
-	 * <br>- TABLE_OWNER
-	 * <br>- TABLE_COMMENT
-	 * <br>- TABLE_LOCATION
-	 * <br>- TABLE_INPUT_FORMAT
-	 * <br>- TABLE_OUTPOUT_FORMAT
-	 * @param hiveClient A hive client connection
-	 * @param hiveCatalogOutput The output FileWriter where table Metadata is exported to
-	 * @param database The Hive Database for which Table's Metadata will be exported
-	 * @throws NoSuchObjectException
-	 * @throws TException
-	 */
-	private static void exportTables(HiveMetaStoreClient hiveClient, BufferedWriter hiveCatalogOutput,
-			String database) throws NoSuchObjectException, TException {
-		List<String> tables = hiveClient.getAllTables(database);
-		
-		for(String tbl : tables) {
-			TableElement table = new TableElement(hiveClient.getTable(database, tbl));
-			try {
-				table.writeRecord(hiveCatalogOutput);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-	}
-
 	private static void exportDatabases(HiveMetaStoreClient hiveClient,
 			BufferedWriter hiveCatalogOutput) throws NoSuchObjectException, TException {
 		List<String> databases = hiveClient.getAllDatabases();
 		
-		for(String database : databases) {
-			DatabaseElement db = new DatabaseElement(hiveClient.getDatabase(database));
+		for(String dbName : databases) {
+			DatabaseElement dbElement = new DatabaseElement(hiveClient.getDatabase(dbName));
 			try {
-				db.writeRecord(hiveCatalogOutput);
+				dbElement.writeRecord(hiveCatalogOutput);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			exportTables(hiveClient, hiveCatalogOutput, database);
+			exportTables(hiveClient, hiveCatalogOutput, dbName);
 		}
+	}
+	
+	private static void exportTables(HiveMetaStoreClient hiveClient, BufferedWriter hiveCatalogOutput,
+			String dbName) throws NoSuchObjectException, TException {
+		List<String> tables = hiveClient.getAllTables(dbName);
+		
+		for(String tableName : tables) {
+			TableElement tableElement = new TableElement(hiveClient.getTable(dbName, tableName));
+			try {
+				tableElement.writeRecord(hiveCatalogOutput);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			exportColumns(hiveClient, hiveCatalogOutput, dbName, tableName);
+		}
+	}
+	
+	private static void exportColumns(HiveMetaStoreClient hiveClient,
+			BufferedWriter hiveCatalogOutput, String databaseName, String tableName) {
+		
+		try {
+			Table table = hiveClient.getTable(databaseName, tableName);
+			StorageDescriptor sd = table.getSd();
+			for(FieldSchema field : sd.getCols()) {
+				ColumnElement colElement = new ColumnElement(table, field);
+				colElement.writeRecord(hiveCatalogOutput);
+			}
+		} catch (TException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
 	}
 }

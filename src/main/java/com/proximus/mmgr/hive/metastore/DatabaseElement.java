@@ -1,7 +1,5 @@
 package com.proximus.mmgr.hive.metastore;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 
 import com.proximus.mmgr.Element;
@@ -33,7 +31,7 @@ public class DatabaseElement extends Element implements ElementWritable {
 	}
 	
 	/**
-	 * @return a formated string of the Database attributes name separated by the specified separator.
+	 * @return a formated string of the Database attributes name separated by the object separator.
 	 */
 	public String getHeader() {
 		StringBuilder header = new StringBuilder();
@@ -46,7 +44,7 @@ public class DatabaseElement extends Element implements ElementWritable {
 	}
 	
 	/**
-	 * @return a formated string of the Element values separated by the specified separator.
+	 * @return a formated string of the Element values separated by the object separator.
 	 */
 	public String getRecord() {
 		ArrayList<String> attributes = new ArrayList<String>();
@@ -56,18 +54,6 @@ public class DatabaseElement extends Element implements ElementWritable {
 		attributes.add(db.getOwnerName());
 		
 		return super.formatRecord(attributes);
-	}
-
-	@Override
-	public void writeRecord(BufferedWriter buffer) throws IOException {
-		buffer.write(this.getRecord());
-		buffer.newLine();
-	}
-
-	@Override
-	public void writeHeader(BufferedWriter buffer) throws IOException {
-		buffer.write(this.getHeader());
-		buffer.newLine();
 	}
 
 }
