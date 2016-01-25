@@ -8,7 +8,7 @@ import com.proximus.mmgr.ElementWritable;
 import org.apache.hadoop.hive.metastore.api.Database;
 
 /**
- * A sub-type of Elements that captures the Metadata of a Hive Metastore Database.
+ * A sub-type of Elements that captures the Metadata of a HiveMetastore Database.
  * @author Jonathan Puvilland
  *
  */
@@ -25,6 +25,10 @@ public class DatabaseElement extends Element implements ElementWritable {
 		type,id,name,description,parent,locationUri,ownerName
 	};
 	
+	/**
+	 * Creates a DatabaseElement initialized with a HiveMetastore Database Metadata.
+	 * @param db a HiveMetastore Database object
+	 */
 	public DatabaseElement(Database db) {
 		super(db.getName(), db.getName(), db.getDescription(), DATABASE_DEFAULT_PARENT, DATABASE_ELEMENT_TYPE);
 		this.db = db;
@@ -53,7 +57,7 @@ public class DatabaseElement extends Element implements ElementWritable {
 		attributes.add(db.getLocationUri());
 		attributes.add(db.getOwnerName());
 		
-		return super.formatRecord(attributes);
+		return super.formatAttributes(attributes);
 	}
 
 }

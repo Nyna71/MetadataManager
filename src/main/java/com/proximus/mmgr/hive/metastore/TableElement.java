@@ -65,7 +65,7 @@ public class TableElement extends Element implements ElementWritable {
 		attributes.add(table.getViewOriginalText());
 		attributes.add(table.getViewExpandedText());
 		
-		return super.formatRecord(attributes);
+		return super.formatAttributes(attributes);
 	}
 
 }

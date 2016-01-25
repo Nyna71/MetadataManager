@@ -15,7 +15,6 @@ import com.proximus.mmgr.ElementWritable;
  */
 public class ColumnElement extends Element implements ElementWritable {
 	public static final String COL_ELEMENT_TYPE = "COL";
-	public static final String DATABASE_DEFAULT_PARENT = "";
 	
 	private FieldSchema col;
 	
@@ -56,6 +55,6 @@ public class ColumnElement extends Element implements ElementWritable {
 		attributes.add(super.getRecord());
 		attributes.add(col.getType());
 		
-		return super.formatRecord(attributes);
+		return super.formatAttributes(attributes);
 	}
 }

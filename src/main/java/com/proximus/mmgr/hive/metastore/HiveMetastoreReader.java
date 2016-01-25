@@ -2,9 +2,13 @@ package com.proximus.mmgr.hive.metastore;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
+import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.conf.HiveConf;
@@ -16,46 +20,61 @@ import org.apache.hadoop.hive.metastore.api.StorageDescriptor;
 import org.apache.hadoop.hive.metastore.api.Table;
 import org.apache.thrift.TException;
 
+
+/**
+ * Reads the Hive Metastore repository using the Hive Metastore api, and exports Hive Metadata into a set of
+ * csv files ready to be uploaded in Informatica Metadata Manager.
+ * @author Jonathan Puvilland
+ *
+ */
 public class HiveMetastoreReader {
-	private static final String HIVE_SITE = "/conf/hive-site.xml";
+	private static final String PROPERTIES_FILE = "./etc/HiveMetastoreConfig.xml";
+	private static final Logger logger = Logger.getLogger(HiveMetastoreReader.class.getName());
 
 	public static void main(String[] args) throws Exception
 	{
-		if(!System.getenv().containsKey("HIVE_HOME"))
-		{
-			System.out.println("HIVE_HOME variable is required. Please set HIVE_HOME folder location.");
-			System.exit(1);
-		}
-		System.out.println("Output file: " + args[0]);
+		Properties hiveMetastoreProps = new Properties();
+		File propertiesFile = new File(PROPERTIES_FILE);
+		retrieveProperties(hiveMetastoreProps, propertiesFile);
 		
-		HiveMetaStoreClient hiveClient = new HiveMetaStoreClient(getHiveEnvironment());
+		try {
+			HiveMetaStoreClient hiveClient = new HiveMetaStoreClient(getHiveConfiguration(hiveMetastoreProps));
 
-        try
-        {
-        	File file = new File(args[0]);
+	        File file = new File(hiveMetastoreProps.getProperty("metastore_output_file"));
 			BufferedWriter hiveCatalogOutput = new BufferedWriter(new FileWriter(file));
-			
-    		exportDatabases(hiveClient, hiveCatalogOutput);
-    		hiveCatalogOutput.close(); 
-        } catch (MetaException e) {
-            e.printStackTrace();
-            System.err.println("Constructor error");
-            System.err.println(e.toString());
+	    	exportDatabases(hiveClient, hiveCatalogOutput);
+	    	hiveCatalogOutput.close();
+		} catch (MetaException e) {
+        	logger.log(Level.SEVERE, "Cannot access Hive Metastore ! Make sure the HiveMetastoreConfig.xml properties " +
+        			"correctly references the hive-site.xml file location on your cluster.");
             System.exit(-100);
         }
 	}
 	
 	/**
-	 * Reads the hive-site configuration file present in the HIVE_HOME folder specified as a OS environment variable.
+	 * Reads the hive-site configuration file present in the <i>hive_conf_home</i> folder specified in the HiveMetastoreConfig.xml.
 	 * Adds the username and password to the configuration for accessing the Metastore catalog.
-	 * @return a HiveConfiguration object
+	 * @param hiveMetastoreProps a set of properties for accessing the HiveMetastore and exporting metadata
+	 * @return a HiveConfiguration object for getting access to the HiveMetastore api.
 	 */
-	private static HiveConf getHiveEnvironment()
+	private static HiveConf getHiveConfiguration(Properties hiveMetastoreProps)
 	{
+		String hiveUser = hiveMetastoreProps.getProperty("metastore_user");
+		String hiveConfFile = hiveMetastoreProps.getProperty("hive_conf_home") + 
+				hiveMetastoreProps.getProperty("hive_conf_file");
+		
+		File hiveSiteFile = new File(hiveConfFile);
+		if(!hiveSiteFile.exists()) {
+			logger.log(Level.SEVERE, "Cannot find Hive Configuration file: " + hiveSiteFile);
+			logger.log(Level.SEVERE, "Specify correct location in ./etc/HiveMetastoreConfig.xml");
+			System.exit(-100);
+		}
+		
 		HiveConf hiveConf = new HiveConf();
-		String hiveHome = System.getenv("HIVE_HOME");
-		Path hiveSite = new Path(hiveHome + HIVE_SITE);
-		System.out.println("hiveSite: " + hiveSite);
+		Path hiveSite = new Path(hiveConfFile);
+		
+		logger.log(Level.INFO, "Reading hive properties from " + hiveSite);
+		logger.log(Level.INFO, "Accessing Hive Metastore with user " + hiveUser);
 		
 		hiveConf.addResource(hiveSite);
         hiveConf.setVar(HiveConf.ConfVars.METASTORE_CONNECTION_USER_NAME, "id922010");
@@ -108,6 +127,16 @@ public class HiveMetastoreReader {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+	}
+	
+	private static void retrieveProperties(Properties hiveMetastoreProps, File propertiesFile)
+	{
+		logger.log(Level.INFO, "Reading HiveMetastoreReader properties from " + PROPERTIES_FILE);
+		try {
+			FileInputStream fin = new FileInputStream(propertiesFile);
+			hiveMetastoreProps.loadFromXML(fin);
+		} catch (IOException e) {
+			logger.log(Level.SEVERE, "Properties file not found!");
+		}
 	}
 }
