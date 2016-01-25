@@ -3,7 +3,8 @@
 # Java Doc
 .doc/
 
-.target/surefire-reports
+# Test reports
+.target/surefire-reports/
 
 # Package Files #
 *.jar
