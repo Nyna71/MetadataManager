@@ -4,7 +4,7 @@
 .doc/
 
 # Test reports
-.target/surefire-reports
+.target/surefire-reports/
 
 # Package Files #
 *.jar
