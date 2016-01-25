@@ -1,0 +1,11 @@
+*.class
+
+# Java Doc
+.doc/
+
+.target/surefire-reports
+
+# Package Files #
+*.jar
+*.war
+*.ear
