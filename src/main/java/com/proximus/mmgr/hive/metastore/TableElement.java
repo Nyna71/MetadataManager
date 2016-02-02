@@ -26,6 +26,10 @@ public class TableElement extends Element implements ElementWritable {
 		viewOriginalText,viewExpandedText
 	};
 
+	/**
+	 * Creates a TableElement initialized with a HiveMetastore Table Metadata
+	 * @param table a HiveMetastore Table object
+	 */
 	public TableElement(Table table) {
 		super(table.getDbName() + "." + table.getTableName(), table.getTableName(), "", 
 				table.getDbName(), TABLE_ELEMENT_TYPE);
@@ -37,9 +41,7 @@ public class TableElement extends Element implements ElementWritable {
 		this.table = table;
 	}
 	
-	/**
-	 * @return a formated string of the Table attributes name separated by the object separator.
-	 */
+	@Override
 	public String getHeader() {
 		StringBuilder header = new StringBuilder();
 		for(_HEADER value : _HEADER.values()) {
@@ -50,9 +52,6 @@ public class TableElement extends Element implements ElementWritable {
 		return	header.substring(0, header.length() -1);
 	}
 
-	/**
-	 * @return a formated string of the Table values separated by the object separator.
-	 */
 	@Override
 	public String getRecord() {
 		ArrayList<String> attributes = new ArrayList<String>();

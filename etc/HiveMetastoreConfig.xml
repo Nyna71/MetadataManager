@@ -4,11 +4,15 @@
 	<comment>Parameter file for exporting HiveMetastore Metadata to Metadata Manager</comment>
 	<entry key="hive_conf_home">/usr/hdp/current/hive-server2/conf/</entry>
 	<entry key="hive_conf_file">hive-site.xml</entry>
+	<entry key="logFile">log/HiveMetastoreReader.log</entry>
+	
+	<entry key="authentication_method">keytab</entry>
+	<entry key="kerberos_ticket">/tmp/krb5cc_0</entry>
+	<entry key="kerberos_keytab">/etc/security/keytabs/hive.service.keytab</entry>
+	
 	<entry key="metastore_output_dir">out</entry>
 	<entry key="metastore_database_file">HiveMetastoreDatabases.csv</entry>
 	<entry key="metastore_table_file">HiveMetastoreTables.csv</entry>
 	<entry key="metastore_column_file">HiveMetastoreColumns.csv</entry>
 	<entry key="metastore_output_file">HiveMetastoreElements.csv</entry>
-	<entry key="metastore_user">id922010</entry>
-	<entry key="metastore_password">id922010</entry>
 </properties>

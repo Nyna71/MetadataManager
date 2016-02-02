@@ -25,6 +25,11 @@ public class ColumnElement extends Element implements ElementWritable {
 		type,id,name,description,parent,colType
 	};
 	
+	/**
+	 * Creates a ColumnElement initialized with a HiveMetastore Column (FieldSchema) Metadata
+	 * @param table a HiveMetastore Table object
+	 * @param col a HiveMetastore Column (FieldSchema) object
+	 */
 	public ColumnElement(Table table, FieldSchema col) {
 		super(table.getDbName() + "." + table.getTableName() + "." + col.getName(), col.getName(), col.getComment(), 
 				table.getDbName() + "." + table.getTableName(), COL_ELEMENT_TYPE);
@@ -32,9 +37,7 @@ public class ColumnElement extends Element implements ElementWritable {
 		this.col = col;
 	}
 	
-	/**
-	 * @return a formated string of the Column attributes name separated by the object separator.
-	 */
+	@Override
 	public String getHeader() {
 		StringBuilder header = new StringBuilder();
 		for(_HEADER value : _HEADER.values()) {
@@ -45,9 +48,6 @@ public class ColumnElement extends Element implements ElementWritable {
 		return	header.substring(0, header.length() -1);
 	}
 	
-	/**
-	 * @return a formated string of the Column values separated by the object separator.
-	 */
 	@Override
 	public String getRecord() {
 		ArrayList<String> attributes = new ArrayList<String>();
