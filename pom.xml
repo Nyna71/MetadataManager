@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.proximus.mmgr</groupId>
   <artifactId>HiveMetastoreReader</artifactId>
-  <version>0.2</version>
+  <version>0.3</version>
   <name>HiveMetastoreReader</name>
   <dependencies>
   	<dependency>

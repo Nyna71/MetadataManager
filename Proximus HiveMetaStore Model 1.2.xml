@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE INF_IMM_METADATA_CONFIG SYSTEM "ImmMetadataConfig.dtd">
-<INF_IMM_METADATA_CONFIG Version="9.6.1.2">
+<INF_IMM_METADATA_CONFIG Version="9.6.1.3">
 <Originator>
   <CreatedBy>Jonathan Puvilland</CreatedBy>
   <CreatedOn>2015-06-04 08:42:57.0</CreatedOn>
   <ModifiedBy>Jonathan Puvilland</ModifiedBy>
-  <ModifiedOn>2015-06-04 08:42:57.0</ModifiedOn>
+  <ModifiedOn>2016-02-03 08:42:57.0</ModifiedOn>
   <OriginatorId></OriginatorId>
   <OriginatorType>Proximus</OriginatorType>
   <OriginatorName>Proximus</OriginatorName>
@@ -64,14 +64,14 @@
 <ClassDef>
   <PackageId>com.proximus.hive.metastore.custom</PackageId>
   <OriginatorId></OriginatorId>
-  <CreatedBy></CreatedBy>
-  <CreatedOn>1969-12-31 16:00:00.0</CreatedOn>
-  <ModifiedBy></ModifiedBy>
-  <ModifiedOn>1969-12-31 16:00:00.0</ModifiedOn>
+  <CreatedBy>Jonathan Puvilland</CreatedBy>
+  <CreatedOn>2015-06-04 08:42:57.0</CreatedOn>
+  <ModifiedBy>Jonathan Puvilland</ModifiedBy>
+  <ModifiedOn>2016-02-03 08:42:57.0</ModifiedOn>
   <ClassName>Database</ClassName>
   <ClassType>Database</ClassType>
   <ClassLabel>Database</ClassLabel>
-  <ClassDesc></ClassDesc>
+  <ClassDesc>A Hive Database object</ClassDesc>
   <ClassIcon>/common/generic/Schema.gif</ClassIcon>
   <ClassInvalidIcon></ClassInvalidIcon>
   <GroupName></GroupName>
@@ -90,7 +90,22 @@
   <EndpointFlag>false</EndpointFlag>
   <SequenceOverrideFlag>false</SequenceOverrideFlag>
   <BaseClasses>    
-  </BaseClasses>      
+  </BaseClasses>
+  <ClassAttribute>  
+    <ClassAttrName>name</ClassAttrName>
+    <ClassAttrLabel>Name</ClassAttrLabel>
+    <ClassAttrDesc>The name of the object</ClassAttrDesc>
+    <ClassAttrUsage></ClassAttrUsage>
+    <ClassAttrSeq>1</ClassAttrSeq>
+    <DataType>String</DataType>
+    <DefaultValue></DefaultValue>
+    <ExtendedFlag>false</ExtendedFlag>
+    <EditableFlag>false</EditableFlag>
+    <MandatoryFlag>true</MandatoryFlag>
+    <DeletedFlag>false</DeletedFlag>
+    <TopAttributeFlag>true</TopAttributeFlag>
+    <OriginatorId></OriginatorId>
+  </ClassAttribute>   
   <ClassAttribute>  
     <ClassAttrName>businessName</ClassAttrName>
     <ClassAttrLabel>Business Name</ClassAttrLabel>
@@ -105,75 +120,60 @@
     <DeletedFlag>false</DeletedFlag>
     <TopAttributeFlag>true</TopAttributeFlag>
     <OriginatorId></OriginatorId>
-  </ClassAttribute>  
+  </ClassAttribute>
   <ClassAttribute>  
-    <ClassAttrName>infa_description</ClassAttrName>
+    <ClassAttrName>description</ClassAttrName>
     <ClassAttrLabel>Description</ClassAttrLabel>
     <ClassAttrDesc>The description of the element</ClassAttrDesc>
     <ClassAttrUsage></ClassAttrUsage>
-    <ClassAttrSeq>4</ClassAttrSeq>
+    <ClassAttrSeq>3</ClassAttrSeq>
     <DataType>LongString</DataType>
     <DefaultValue></DefaultValue>
     <ExtendedFlag>false</ExtendedFlag>
-    <EditableFlag>true</EditableFlag>
+    <EditableFlag>false</EditableFlag>
     <MandatoryFlag>false</MandatoryFlag>
     <DeletedFlag>false</DeletedFlag>
     <TopAttributeFlag>true</TopAttributeFlag>
     <OriginatorId></OriginatorId>
-  </ClassAttribute>  
+  </ClassAttribute> 
   <ClassAttribute>  
-    <ClassAttrName>infa_label</ClassAttrName>
-    <ClassAttrLabel>Label</ClassAttrLabel>
-    <ClassAttrDesc>The display label of the element</ClassAttrDesc>
-    <ClassAttrUsage></ClassAttrUsage>
-    <ClassAttrSeq>3</ClassAttrSeq>
-    <DataType>String</DataType>
-    <DefaultValue></DefaultValue>
-    <ExtendedFlag>false</ExtendedFlag>
-    <EditableFlag>true</EditableFlag>
-    <MandatoryFlag>false</MandatoryFlag>
-    <DeletedFlag>false</DeletedFlag>
-    <TopAttributeFlag>true</TopAttributeFlag>
-    <OriginatorId></OriginatorId>
-  </ClassAttribute>  
-  <ClassAttribute>  
-    <ClassAttrName>name</ClassAttrName>
-    <ClassAttrLabel>Name</ClassAttrLabel>
-    <ClassAttrDesc>The name of the object</ClassAttrDesc>
-    <ClassAttrUsage></ClassAttrUsage>
-    <ClassAttrSeq>1</ClassAttrSeq>
-    <DataType>String</DataType>
-    <DefaultValue></DefaultValue>
-    <ExtendedFlag>false</ExtendedFlag>
-    <EditableFlag>true</EditableFlag>
-    <MandatoryFlag>false</MandatoryFlag>
-    <DeletedFlag>false</DeletedFlag>
-    <TopAttributeFlag>true</TopAttributeFlag>
-    <OriginatorId></OriginatorId>
-  </ClassAttribute>
-    <ClassAttribute>  
-    <ClassAttrName>hdfslocation</ClassAttrName>
+    <ClassAttrName>locationUri</ClassAttrName>
     <ClassAttrLabel>HDFS Location</ClassAttrLabel>
     <ClassAttrDesc>The physical location on the hadoop file system</ClassAttrDesc>
     <ClassAttrUsage></ClassAttrUsage>
-    <ClassAttrSeq>1</ClassAttrSeq>
+    <ClassAttrSeq>4</ClassAttrSeq>
     <DataType>String</DataType>
     <DefaultValue></DefaultValue>
     <ExtendedFlag>false</ExtendedFlag>
-    <EditableFlag>true</EditableFlag>
+    <EditableFlag>false</EditableFlag>
     <MandatoryFlag>false</MandatoryFlag>
     <DeletedFlag>false</DeletedFlag>
-    <TopAttributeFlag>true</TopAttributeFlag>
+    <TopAttributeFlag>false</TopAttributeFlag>
+    <OriginatorId></OriginatorId>
+  </ClassAttribute>
+  <ClassAttribute>  
+    <ClassAttrName>ownerName</ClassAttrName>
+    <ClassAttrLabel>Owner Name</ClassAttrLabel>
+    <ClassAttrDesc>The object's Owner Name</ClassAttrDesc>
+    <ClassAttrUsage></ClassAttrUsage>
+    <ClassAttrSeq>5</ClassAttrSeq>
+    <DataType>String</DataType>
+    <DefaultValue></DefaultValue>
+    <ExtendedFlag>false</ExtendedFlag>
+    <EditableFlag>false</EditableFlag>
+    <MandatoryFlag>false</MandatoryFlag>
+    <DeletedFlag>false</DeletedFlag>
+    <TopAttributeFlag>false</TopAttributeFlag>
     <OriginatorId></OriginatorId>
   </ClassAttribute>
 </ClassDef>
 <ClassDef>
   <PackageId>com.proximus.hive.metastore.custom</PackageId>
   <OriginatorId></OriginatorId>
-  <CreatedBy></CreatedBy>
-  <CreatedOn>1969-12-31 16:00:00.0</CreatedOn>
-  <ModifiedBy></ModifiedBy>
-  <ModifiedOn>1969-12-31 16:00:00.0</ModifiedOn>
+  <CreatedBy>Jonathan Puvilland</CreatedBy>
+  <CreatedOn>2015-06-04 08:42:57.0</CreatedOn>
+  <ModifiedBy>Jonathan Puvilland</ModifiedBy>
+  <ModifiedOn>2016-02-03 08:42:57.0</ModifiedOn>
   <ClassName>Index</ClassName>
   <ClassType></ClassType>
   <ClassLabel>Index</ClassLabel>
@@ -291,10 +291,10 @@
 <ClassDef>
   <PackageId>com.proximus.hive.metastore.custom</PackageId>
   <OriginatorId></OriginatorId>
-  <CreatedBy></CreatedBy>
-  <CreatedOn>1969-12-31 16:00:00.0</CreatedOn>
-  <ModifiedBy></ModifiedBy>
-  <ModifiedOn>1969-12-31 16:00:00.0</ModifiedOn>
+  <CreatedBy>Jonathan Puvilland</CreatedBy>
+  <CreatedOn>2015-06-04 08:42:57.0</CreatedOn>
+  <ModifiedBy>Jonathan Puvilland</ModifiedBy>
+  <ModifiedOn>2016-02-03 08:42:57.0</ModifiedOn>
   <ClassName>IndexMember</ClassName>
   <ClassType></ClassType>
   <ClassLabel>IndexMember</ClassLabel>
@@ -412,10 +412,10 @@
 <ClassDef>
   <PackageId>com.proximus.hive.metastore.custom</PackageId>
   <OriginatorId></OriginatorId>
-  <CreatedBy></CreatedBy>
-  <CreatedOn>1969-12-31 16:00:00.0</CreatedOn>
-  <ModifiedBy></ModifiedBy>
-  <ModifiedOn>1969-12-31 16:00:00.0</ModifiedOn>
+  <CreatedBy>Jonathan Puvilland</CreatedBy>
+  <CreatedOn>2015-06-04 08:42:57.0</CreatedOn>
+  <ModifiedBy>Jonathan Puvilland</ModifiedBy>
+  <ModifiedOn>2016-02-03 08:42:57.0</ModifiedOn>
   <ClassName>Table</ClassName>
   <ClassType>Table</ClassType>
   <ClassLabel>Table</ClassLabel>
@@ -438,22 +438,22 @@
   <EndpointFlag>true</EndpointFlag>
   <SequenceOverrideFlag>false</SequenceOverrideFlag>
   <BaseClasses>    
-  </BaseClasses>     
-    <ClassAttribute>  
-    <ClassAttrName>hdfslocation</ClassAttrName>
-    <ClassAttrLabel>HDFS Location</ClassAttrLabel>
-    <ClassAttrDesc>The physical location on the hadoop filesystem</ClassAttrDesc>
+  </BaseClasses>
+  <ClassAttribute>  
+    <ClassAttrName>name</ClassAttrName>
+    <ClassAttrLabel>Name</ClassAttrLabel>
+    <ClassAttrDesc>The name of the object</ClassAttrDesc>
     <ClassAttrUsage></ClassAttrUsage>
     <ClassAttrSeq>1</ClassAttrSeq>
     <DataType>String</DataType>
     <DefaultValue></DefaultValue>
     <ExtendedFlag>false</ExtendedFlag>
-    <EditableFlag>true</EditableFlag>
-    <MandatoryFlag>false</MandatoryFlag>
+    <EditableFlag>false</EditableFlag>
+    <MandatoryFlag>true</MandatoryFlag>
     <DeletedFlag>false</DeletedFlag>
     <TopAttributeFlag>true</TopAttributeFlag>
     <OriginatorId></OriginatorId>
-  </ClassAttribute>  
+  </ClassAttribute>     
   <ClassAttribute>  
     <ClassAttrName>businessName</ClassAttrName>
     <ClassAttrLabel>Business Name</ClassAttrLabel>
@@ -468,52 +468,67 @@
     <DeletedFlag>false</DeletedFlag>
     <TopAttributeFlag>true</TopAttributeFlag>
     <OriginatorId></OriginatorId>
-  </ClassAttribute>  
+  </ClassAttribute>
   <ClassAttribute>  
-    <ClassAttrName>infa_description</ClassAttrName>
+    <ClassAttrName>description</ClassAttrName>
     <ClassAttrLabel>Description</ClassAttrLabel>
     <ClassAttrDesc>The description of the element</ClassAttrDesc>
     <ClassAttrUsage></ClassAttrUsage>
-    <ClassAttrSeq>4</ClassAttrSeq>
+    <ClassAttrSeq>3</ClassAttrSeq>
     <DataType>LongString</DataType>
     <DefaultValue></DefaultValue>
     <ExtendedFlag>false</ExtendedFlag>
-    <EditableFlag>true</EditableFlag>
+    <EditableFlag>false</EditableFlag>
     <MandatoryFlag>false</MandatoryFlag>
     <DeletedFlag>false</DeletedFlag>
     <TopAttributeFlag>true</TopAttributeFlag>
     <OriginatorId></OriginatorId>
-  </ClassAttribute>  
+  </ClassAttribute>
   <ClassAttribute>  
-    <ClassAttrName>infa_label</ClassAttrName>
-    <ClassAttrLabel>Label</ClassAttrLabel>
-    <ClassAttrDesc>The display label of the element</ClassAttrDesc>
+    <ClassAttrName>tableType</ClassAttrName>
+    <ClassAttrLabel>Table Type</ClassAttrLabel>
+    <ClassAttrDesc>The type of Hive table (Managed, External)</ClassAttrDesc>
     <ClassAttrUsage></ClassAttrUsage>
-    <ClassAttrSeq>3</ClassAttrSeq>
+    <ClassAttrSeq>4</ClassAttrSeq>
     <DataType>String</DataType>
     <DefaultValue></DefaultValue>
     <ExtendedFlag>false</ExtendedFlag>
-    <EditableFlag>true</EditableFlag>
+    <EditableFlag>false</EditableFlag>
     <MandatoryFlag>false</MandatoryFlag>
     <DeletedFlag>false</DeletedFlag>
     <TopAttributeFlag>true</TopAttributeFlag>
     <OriginatorId></OriginatorId>
-  </ClassAttribute>  
+  </ClassAttribute> 
   <ClassAttribute>  
-    <ClassAttrName>name</ClassAttrName>
-    <ClassAttrLabel>Name</ClassAttrLabel>
-    <ClassAttrDesc>The name of the object</ClassAttrDesc>
+    <ClassAttrName>locationUri</ClassAttrName>
+    <ClassAttrLabel>HDFS Location</ClassAttrLabel>
+    <ClassAttrDesc>The physical location on the hadoop file system</ClassAttrDesc>
     <ClassAttrUsage></ClassAttrUsage>
-    <ClassAttrSeq>1</ClassAttrSeq>
+    <ClassAttrSeq>5</ClassAttrSeq>
     <DataType>String</DataType>
     <DefaultValue></DefaultValue>
     <ExtendedFlag>false</ExtendedFlag>
-    <EditableFlag>true</EditableFlag>
+    <EditableFlag>false</EditableFlag>
     <MandatoryFlag>false</MandatoryFlag>
     <DeletedFlag>false</DeletedFlag>
-    <TopAttributeFlag>true</TopAttributeFlag>
+    <TopAttributeFlag>false</TopAttributeFlag>
     <OriginatorId></OriginatorId>
-  </ClassAttribute>  
+  </ClassAttribute>
+  <ClassAttribute>  
+    <ClassAttrName>ownerName</ClassAttrName>
+    <ClassAttrLabel>Owner Name</ClassAttrLabel>
+    <ClassAttrDesc>The object's Owner Name</ClassAttrDesc>
+    <ClassAttrUsage></ClassAttrUsage>
+    <ClassAttrSeq>6</ClassAttrSeq>
+    <DataType>String</DataType>
+    <DefaultValue></DefaultValue>
+    <ExtendedFlag>false</ExtendedFlag>
+    <EditableFlag>false</EditableFlag>
+    <MandatoryFlag>false</MandatoryFlag>
+    <DeletedFlag>false</DeletedFlag>
+    <TopAttributeFlag>false</TopAttributeFlag>
+    <OriginatorId></OriginatorId>
+  </ClassAttribute>
 </ClassDef>
 <ClassDef>
   <PackageId>com.proximus.hive.metastore.custom</PackageId>
@@ -1017,10 +1032,10 @@
 <ClassDef>
   <PackageId>com.proximus.hive.metastore.custom</PackageId>
   <OriginatorId></OriginatorId>
-  <CreatedBy></CreatedBy>
-  <CreatedOn>1969-12-31 16:00:00.0</CreatedOn>
-  <ModifiedBy></ModifiedBy>
-  <ModifiedOn>1969-12-31 16:00:00.0</ModifiedOn>
+  <CreatedBy>Jonathan Puvilland</CreatedBy>
+  <CreatedOn>2015-06-04 08:42:57.0</CreatedOn>
+  <ModifiedBy>Jonathan Puvilland</ModifiedBy>
+  <ModifiedOn>2016-02-03 08:42:57.0</ModifiedOn>
   <ClassName>View</ClassName>
   <ClassType>View</ClassType>
   <ClassLabel>View</ClassLabel>
@@ -1045,20 +1060,20 @@
   <BaseClasses>    
   </BaseClasses>       
   <ClassAttribute>  
-    <ClassAttrName>ViewStatement</ClassAttrName>
-    <ClassAttrLabel>ViewStatement</ClassAttrLabel>
-    <ClassAttrDesc></ClassAttrDesc>
+    <ClassAttrName>name</ClassAttrName>
+    <ClassAttrLabel>Name</ClassAttrLabel>
+    <ClassAttrDesc>The name of the object</ClassAttrDesc>
     <ClassAttrUsage></ClassAttrUsage>
-    <ClassAttrSeq>9</ClassAttrSeq>
+    <ClassAttrSeq>1</ClassAttrSeq>
     <DataType>String</DataType>
     <DefaultValue></DefaultValue>
     <ExtendedFlag>false</ExtendedFlag>
-    <EditableFlag>true</EditableFlag>
-    <MandatoryFlag>false</MandatoryFlag>
+    <EditableFlag>false</EditableFlag>
+    <MandatoryFlag>true</MandatoryFlag>
     <DeletedFlag>false</DeletedFlag>
     <TopAttributeFlag>true</TopAttributeFlag>
     <OriginatorId></OriginatorId>
-  </ClassAttribute>  
+  </ClassAttribute>     
   <ClassAttribute>  
     <ClassAttrName>businessName</ClassAttrName>
     <ClassAttrLabel>Business Name</ClassAttrLabel>
@@ -1073,52 +1088,52 @@
     <DeletedFlag>false</DeletedFlag>
     <TopAttributeFlag>true</TopAttributeFlag>
     <OriginatorId></OriginatorId>
-  </ClassAttribute>  
+  </ClassAttribute>
   <ClassAttribute>  
-    <ClassAttrName>infa_description</ClassAttrName>
+    <ClassAttrName>description</ClassAttrName>
     <ClassAttrLabel>Description</ClassAttrLabel>
-    <ClassAttrDesc>The description of the element</ClassAttrDesc>
+    <ClassAttrDesc>The description of the object</ClassAttrDesc>
     <ClassAttrUsage></ClassAttrUsage>
-    <ClassAttrSeq>4</ClassAttrSeq>
+    <ClassAttrSeq>3</ClassAttrSeq>
     <DataType>LongString</DataType>
     <DefaultValue></DefaultValue>
     <ExtendedFlag>false</ExtendedFlag>
-    <EditableFlag>true</EditableFlag>
+    <EditableFlag>false</EditableFlag>
     <MandatoryFlag>false</MandatoryFlag>
     <DeletedFlag>false</DeletedFlag>
     <TopAttributeFlag>true</TopAttributeFlag>
     <OriginatorId></OriginatorId>
-  </ClassAttribute>  
+  </ClassAttribute>
   <ClassAttribute>  
-    <ClassAttrName>infa_label</ClassAttrName>
-    <ClassAttrLabel>Label</ClassAttrLabel>
-    <ClassAttrDesc>The display label of the element</ClassAttrDesc>
+    <ClassAttrName>viewType</ClassAttrName>
+    <ClassAttrLabel>View Type</ClassAttrLabel>
+    <ClassAttrDesc>The type of View</ClassAttrDesc>
     <ClassAttrUsage></ClassAttrUsage>
-    <ClassAttrSeq>3</ClassAttrSeq>
+    <ClassAttrSeq>4</ClassAttrSeq>
     <DataType>String</DataType>
     <DefaultValue></DefaultValue>
     <ExtendedFlag>false</ExtendedFlag>
-    <EditableFlag>true</EditableFlag>
+    <EditableFlag>false</EditableFlag>
     <MandatoryFlag>false</MandatoryFlag>
     <DeletedFlag>false</DeletedFlag>
     <TopAttributeFlag>true</TopAttributeFlag>
     <OriginatorId></OriginatorId>
-  </ClassAttribute>  
+  </ClassAttribute> 
   <ClassAttribute>  
-    <ClassAttrName>name</ClassAttrName>
-    <ClassAttrLabel>Name</ClassAttrLabel>
-    <ClassAttrDesc>The name of the object</ClassAttrDesc>
+    <ClassAttrName>ownerName</ClassAttrName>
+    <ClassAttrLabel>Owner Name</ClassAttrLabel>
+    <ClassAttrDesc>The object's Owner Name</ClassAttrDesc>
     <ClassAttrUsage></ClassAttrUsage>
-    <ClassAttrSeq>1</ClassAttrSeq>
+    <ClassAttrSeq>6</ClassAttrSeq>
     <DataType>String</DataType>
     <DefaultValue></DefaultValue>
     <ExtendedFlag>false</ExtendedFlag>
-    <EditableFlag>true</EditableFlag>
+    <EditableFlag>false</EditableFlag>
     <MandatoryFlag>false</MandatoryFlag>
     <DeletedFlag>false</DeletedFlag>
-    <TopAttributeFlag>true</TopAttributeFlag>
+    <TopAttributeFlag>false</TopAttributeFlag>
     <OriginatorId></OriginatorId>
-  </ClassAttribute>  
+  </ClassAttribute>
 </ClassDef>
 <AssociationDef>
   <PackageId>com.proximus.hive.metastore.custom</PackageId>

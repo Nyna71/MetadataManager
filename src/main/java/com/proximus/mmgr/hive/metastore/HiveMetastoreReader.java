@@ -43,26 +43,24 @@ public class HiveMetastoreReader {
 	 */
 	public static void main(String[] args) 
 	{
+		HiveMetastoreReader reader = new HiveMetastoreReader();
 		Properties metastoreReaderProperties = new Properties();
 		File metastoreReaderConfig = new File(PROPERTIES_FILE);
-		
 		metastoreReaderProperties = getMetastoreReaderProperties(metastoreReaderConfig);
+		MetadataBufferedWriters bufferedWriters = reader.new MetadataBufferedWriters(metastoreReaderProperties);
 		
 		try {
 			HiveMetaStoreClient hiveClient = new HiveMetaStoreClient(getHiveConfiguration(metastoreReaderProperties));
+	    	exportDatabases(hiveClient, bufferedWriters);
 
-	        File file = new File(metastoreReaderProperties.getProperty("metastore_output_file"));
-			BufferedWriter hiveCatalogOutput = new BufferedWriter(new FileWriter(file));
-	    	exportDatabases(hiveClient, hiveCatalogOutput);
-	    	hiveCatalogOutput.close();
-		} catch (MetaException e) {
+		} catch (MetaException metaException) {
         	logger.log(Level.SEVERE, "Cannot access Hive Metastore ! Make sure the HiveMetastoreConfig.xml properties " +
-        			"correctly references the hive-site.xml file location on your cluster.");
+        			"correctly references the hive-site.xml file location on your cluster.", metaException);
             System.exit(-100);
-        } catch (IOException e) {
-        	logger.log(Level.SEVERE, "Cannot open Metastore output file");
-			e.printStackTrace();
-		} 
+		}
+		
+		bufferedWriters.closeBufferedWriters();
+		
 	}
 	
 	/**
@@ -85,11 +83,11 @@ public class HiveMetastoreReader {
 			logFileHandler.setFormatter(new SimpleFormatter());
 			logger.addHandler(logFileHandler);
 			
-		} catch (IOException e) {
+		} catch (IOException ioException) {
 			StringBuilder errorMsg = new StringBuilder();
 			errorMsg.append("Configuration file not found: " + PROPERTIES_FILE + "! ");
 			errorMsg.append("Make sure the xml configuration file is avaialble in etc folder.");
-			logger.log(Level.SEVERE, errorMsg.toString());
+			logger.log(Level.SEVERE, errorMsg.toString(), ioException);
 			System.exit(-100);
 		}
 
@@ -103,7 +101,6 @@ public class HiveMetastoreReader {
 	 */
 	private static HiveConf getHiveConfiguration(Properties hiveMetastoreProps)
 	{
-		String hiveUser = hiveMetastoreProps.getProperty("metastore_user");
 		String authenticationMethod= hiveMetastoreProps.getProperty("authentication_method");
 		String hiveConfFile = hiveMetastoreProps.getProperty("hive_conf_home") + 
 				hiveMetastoreProps.getProperty("hive_conf_file");
@@ -122,36 +119,36 @@ public class HiveMetastoreReader {
 		logger.log(Level.INFO, "Reading hive properties from " + hiveSite + "\n");
 		
 		hiveConf.addResource(hiveSite);
-        //hiveConf.setVar(HiveConf.ConfVars.METASTORE_CONNECTION_USER_NAME, hiveUser);
-        //hiveConf.setVar(HiveConf.ConfVars.METASTORE_KERBEROS_PRINCIPAL, "hive/sandbox.hortonworks.com@PROXIMUS.NET");
         
 		// Set-Up Kerberos authentication
         hiveConf.set("hadoop.security.authentication", "Kerberos");
         UserGroupInformation.setConfiguration(hiveConf);
         
 		try {
+			// Keytab authentication
 			if(authenticationMethod.equals(KEYTAB_AUTHENTICATION_METHOD)) {
 				String keytab = hiveMetastoreProps.getProperty("kerberos_keytab");
 				logger.log(Level.INFO, "Logging in HiveMetastore from Keytab " + keytab);
 		        UserGroupInformation.loginUserFromKeytab("hive/sandbox.hortonworks.com@PROXIMUS.NET", keytab);
 			}
 
+			// Ticket authentication
 			else if(authenticationMethod.equals(TICKET_AUTHENTICATION_METHOD)) {
 				String ticket = hiveMetastoreProps.getProperty("kerberos_ticket");
 				logger.log(Level.INFO, "Logging in HiveMetastore from ticket " + ticket);
-				UserGroupInformation ugi = UserGroupInformation.createProxyUser("hive", 
-						UserGroupInformation.getUGIFromTicketCache(ticket, "hive"));
+				UserGroupInformation.createProxyUser("hive", 
+						UserGroupInformation.getUGIFromTicketCache(ticket, ""));
 			}
 			
 			else {
 				logger.log(Level.SEVERE, "Authentication method undefined. Set authentication_method in configuration file " + 
-						"to kerberos_keytab or kerberos_ticket");
+						"to keytab or ticket");
 			}
 			
-			System.out.println("Connecting with user: " + hiveConf.getUser());
+			logger.log(Level.INFO, "Connecting to Metastore with user: " + hiveConf.getUser());
 			
-		} catch (IOException e) {
-			logger.log(Level.WARNING, "Cannot read Keytab file or Kerberos ticket.");
+		} catch (IOException ioException) {
+			logger.log(Level.WARNING, "Cannot read Keytab file or Kerberos ticket.", ioException);
 		}
         
         return hiveConf;
@@ -160,92 +157,196 @@ public class HiveMetastoreReader {
 	/**
 	 * Writes the Hive Databases Metadata to the Databases output file.
 	 * @param hiveClient the Hive Client session handler
-	 * @param hiveCatalogOutput the buffer wrapping the output database file
+	 * @param bufferedWriters 
 	 * @throws TException Thrift exception
 	 */
 	private static void exportDatabases(HiveMetaStoreClient hiveClient,
-			BufferedWriter hiveCatalogOutput)
+			MetadataBufferedWriters bufferedWriters)
 	{
 		try
 		{
 			List<String> databases = hiveClient.getAllDatabases();
-		
+
 			for(String dbName : databases)
 			{
+				logger.log(Level.INFO, "Exporting metadata for database: " + dbName);
 				DatabaseElement dbElement = new DatabaseElement(hiveClient.getDatabase(dbName));
-				dbElement.writeRecord(hiveCatalogOutput);
-				exportTables(hiveClient, hiveCatalogOutput, dbName);
+				dbElement.writeRecord(bufferedWriters.getDatabaseBufferedWriter());
+				exportTables(hiveClient, bufferedWriters, dbName);
 			}
 			
-		} catch (TException e) {
-			logger.log(Level.SEVERE, "Cannot access HiveMetastore while processing Columns.");
-			e.printStackTrace();
-		
-		} catch (IOException e) {
-			logger.log(Level.SEVERE, "Cannot write to Table output file.");
-			e.printStackTrace();
+		} catch (TException metaException) {
+			logger.log(Level.SEVERE, "Cannot access HiveMetastore while processing Databases.", metaException);
+		} catch (IOException ioException) {
+			logger.log(Level.SEVERE, "Cannot write to database output file.", ioException);
 		}
 	}
 	
 	/**
 	 * Writes the Hive Tables Metadata of the specified Database to the Tables output file.
 	 * @param hiveClient the Hive Client session handler
-	 * @param hiveCatalogOutput the buffer wrapping the output table file
+	 * @param bufferedWriters the buffer wrapping the output table file
 	 * @param dbName the name of the Database holding the Tables to export 
 	 * @throws TException Thrift exception
 	 */
-	private static void exportTables(HiveMetaStoreClient hiveClient, BufferedWriter hiveCatalogOutput,
+	private static void exportTables(HiveMetaStoreClient hiveClient, MetadataBufferedWriters bufferedWriters,
 			String dbName)
 	{
-		try
-		{
-			List<String> tables = hiveClient.getAllTables(dbName);
+		int nbrTablesExported = 0;
 		
+		try
+		{	
+			List<String> tables = hiveClient.getAllTables(dbName);			
+		
+			//Export tables Metadata
 			for(String tableName : tables)
 			{
 				TableElement tableElement = new TableElement(hiveClient.getTable(dbName, tableName));
-				tableElement.writeRecord(hiveCatalogOutput);
-				exportColumns(hiveClient, hiveCatalogOutput, dbName, tableName);
+				tableElement.writeRecord(bufferedWriters.getTableBufferedWriter());
+				exportColumns(hiveClient, bufferedWriters, dbName, tableName);
+				nbrTablesExported++;
 			}
+
+			logger.log(Level.INFO, nbrTablesExported + " tables sucessfully exported.");
 			
-		} catch (TException e) {
-			logger.log(Level.SEVERE, "Cannot access HiveMetastore while processing Columns.");
-			e.printStackTrace();
-		
-		} catch (IOException e) {
-			logger.log(Level.SEVERE, "Cannot write to Table output file.");
-			e.printStackTrace();
-		}
+		} catch (TException metaException) {
+			logger.log(Level.SEVERE, "Cannot access HiveMetastore while processing Tables.", metaException);
+		} catch (IOException ioException) {
+			logger.log(Level.SEVERE, "Cannot write to table output file.", ioException);
+		}		
 	}
 	
 	/**
 	 * Writes the Hive Columns Metadata of the specified Database and Table to the Columns output file.
 	 * @param hiveClient the Hive Client session handler
-	 * @param hiveCatalogOutput the buffer wrapping the output table file
+	 * @param bufferedWriters the buffer wrapping the output table file
 	 * @param dbName the name of the Database holding the Table's Columns to export
 	 * @param tableName the name of the Table holding the Columns to export 
 	 */
 	private static void exportColumns(HiveMetaStoreClient hiveClient,
-			BufferedWriter hiveCatalogOutput, String dbName, String tableName)
+			HiveMetastoreReader.MetadataBufferedWriters bufferedWriters, String dbName, String tableName)
 	{	
 		try
-		{
+		{			
 			Table table = hiveClient.getTable(dbName, tableName);
 			StorageDescriptor sd = table.getSd();
 			
+			//Export columns Metadata
 			for(FieldSchema field : sd.getCols())
 			{
 				ColumnElement colElement = new ColumnElement(table, field);
-				colElement.writeRecord(hiveCatalogOutput);
+				colElement.writeRecord(bufferedWriters.getColumnBufferedWriter());
 			}
 		
-		} catch (TException e) {
-			logger.log(Level.SEVERE, "Cannot access HiveMetastore while processing Columns.");
-			e.printStackTrace();
+		} catch (TException metaException) {
+			logger.log(Level.SEVERE, "Cannot access HiveMetastore while processing Columns.", metaException);
+		} catch (IOException ioException) {
+			logger.log(Level.SEVERE, "Cannot write to column output file.", ioException);
+		}
+	}
+	
+	/**
+	 * Helper class for opening and closing files to export Databases, Tables and Columns Metadata.
+	 * @author Jonathan Puvilland
+	 *
+	 */
+	private class MetadataBufferedWriters {
+		private BufferedWriter databaseBuffer;
+		private BufferedWriter tableBuffer;
+		private BufferedWriter columnBuffer;
+		Properties metastoreReaderProperties;
 		
-		} catch (IOException e) {
-			logger.log(Level.SEVERE, "Cannot write to Table output file.");
-			e.printStackTrace();
+		// The constructor opens the 3 destination files and handles the buffers.
+		MetadataBufferedWriters(Properties metastoreReaderProperties) {
+			
+			this.metastoreReaderProperties = metastoreReaderProperties;
+			
+			databaseBuffer = openDatabaseBufferedWriter();
+			tableBuffer = openTableBufferedWriter();
+			columnBuffer = openColumnBufferedWriter();
+			
+		}
+
+		private BufferedWriter openDatabaseBufferedWriter() {
+			BufferedWriter databaseBuffer;
+			
+			try {
+				File file = new File(
+	        		metastoreReaderProperties.getProperty("metastore_output_dir") + "/" +
+	        		metastoreReaderProperties.getProperty("metastore_database_file",
+	        		"HiveMetastoreDatabases.csv"));
+				
+				logger.log(Level.INFO, "Opening database output file: " + file.getAbsolutePath());
+				databaseBuffer = new BufferedWriter(new FileWriter(file));
+				
+				return databaseBuffer;
+			
+			} catch (IOException ioException) {
+				logger.log(Level.SEVERE, "Cannot open database output file.", ioException);
+				return null;
+			}
+		}
+
+		private BufferedWriter openTableBufferedWriter() {
+			BufferedWriter tableBuffer;
+			
+			try {
+				File file = new File(
+	        		metastoreReaderProperties.getProperty("metastore_output_dir") + "/" +
+	        		metastoreReaderProperties.getProperty("metastore_table_file",
+	        		"HiveMetastoreTables.csv"));
+	        
+				logger.log(Level.INFO, "Opening table output file: " + file.getAbsolutePath());
+				tableBuffer = new BufferedWriter(new FileWriter(file));
+				
+				return tableBuffer;
+			
+			} catch (IOException ioException) {
+				logger.log(Level.SEVERE, "Cannot open table output file.", ioException);
+				return null;
+			}
+		}
+
+		private BufferedWriter openColumnBufferedWriter() {
+			BufferedWriter columnBuffer;
+
+			try {
+		        File file = new File(
+		        		metastoreReaderProperties.getProperty("metastore_output_dir") + "/" +
+		        		metastoreReaderProperties.getProperty("metastore_column_file",
+		        		"HiveMetastoreColumns.csv"));
+	        
+				logger.log(Level.INFO, "Opening column output file: " + file.getAbsolutePath());
+				columnBuffer = new BufferedWriter(new FileWriter(file));
+				
+				return columnBuffer;
+			
+			} catch (IOException ioException) {
+				logger.log(Level.SEVERE, "Cannot open column output file.", ioException);
+				return null;
+			}
+		}
+		
+		BufferedWriter getDatabaseBufferedWriter() {
+			return databaseBuffer;
+		}
+		
+		BufferedWriter getTableBufferedWriter() {
+			return tableBuffer;
+		}
+		
+		BufferedWriter getColumnBufferedWriter() {
+			return columnBuffer;
+		}
+		
+		void closeBufferedWriters() {
+			try {
+				databaseBuffer.close();
+				tableBuffer.close();
+				columnBuffer.close();
+			} catch (IOException ioException) {
+				logger.log(Level.SEVERE, "Cannot close buffered writers", ioException);
+			}
 		}
 	}
 }

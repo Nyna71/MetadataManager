@@ -14,5 +14,4 @@
 	<entry key="metastore_database_file">HiveMetastoreDatabases.csv</entry>
 	<entry key="metastore_table_file">HiveMetastoreTables.csv</entry>
 	<entry key="metastore_column_file">HiveMetastoreColumns.csv</entry>
-	<entry key="metastore_output_file">HiveMetastoreElements.csv</entry>
 </properties>
