@@ -1,4 +1,4 @@
-package com.proximus.mmgr;
+package com.proximus.mmgr.hive.metastore;
 
 import static org.junit.Assert.assertEquals;
 import com.proximus.mmgr.hive.metastore.DatabaseElement;
@@ -34,6 +34,7 @@ public class DatabaseElementTest {
 		db.setOwnerName("ownerName");
 		
 		DatabaseElement dbElem = new DatabaseElement(db);
+		System.out.println(dbElem.getRecord());
 		assertEquals(dbElem.getRecord(), "DB,name,name,description,,locationUri,ownerName");
 	}
 	

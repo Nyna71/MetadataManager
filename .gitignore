@@ -10,3 +10,4 @@ target/surefire-reports
 *.jar
 *.war
 *.ear
+/target/

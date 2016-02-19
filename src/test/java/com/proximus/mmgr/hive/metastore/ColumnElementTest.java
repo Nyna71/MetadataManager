@@ -1,4 +1,4 @@
-package com.proximus.mmgr;
+package com.proximus.mmgr.hive.metastore;
 
 import static org.junit.Assert.*;
 
@@ -17,7 +17,7 @@ public class ColumnElementTest {
 		tbl.setTableName("name");
 		col.setName("col");
 		ColumnElement colElem = new ColumnElement(tbl, col);
-		assertEquals(colElem.getHeader(), "type,id,name,description,parent,colType");
+		assertEquals(colElem.getHeader(), "type,id,name,description,parent,dataType");
 	}
 	
 	@Test
@@ -28,6 +28,7 @@ public class ColumnElementTest {
 		tbl.setTableName("table");
 		col.setName("col");
 		ColumnElement colElem = new ColumnElement(tbl, col);
+		System.out.println(colElem.getHeader());
 		System.out.println(colElem.getRecord());
 		assertEquals(colElem.getRecord(), "COL,db.table.col,col,,db.table,");
 	}

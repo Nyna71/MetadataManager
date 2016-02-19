@@ -13,6 +13,8 @@ public interface ElementWritable {
 	 * Default comma separator used to separate Elements attributes in the get methods
 	 */
 	public static final char DEFAULT_SEPARATOR = ',';
+	public static final char HYPHEN = '"';
+	public static final String HYPHEN_ESCAPE = "\"";
 	
 	/**
 	 * Generates a Metadata Element's attributes header (labels)
