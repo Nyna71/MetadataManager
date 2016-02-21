@@ -8,12 +8,21 @@ import com.proximus.mmgr.ElementWritable;
 import com.proximus.mmgr.hive.metastore.ElementAttributes.TableAttributes;
 
 /**
- * A sub-type of Elements that captures the Metadata of a Hive Metastore Table.
+ * A sub-type of Elements that captures the Metadata of a HiveMetastore Table. The list of attributes is declared
+ * in the <i>TableAttributes</i> interface. All the Element's manipulation methods are inherited from the
+ * <i>AbstractElement</i> parent class.
  * @author Jonathan Puvilland
  *
  */
 public class TableElement extends AbstractElement<TableAttributes> implements ElementWritable {
 	public static final String TABLE_ELEMENT_TYPE = "TBL";
+	
+	public TableElement() {
+		super(TableAttributes.class);
+		this.setAttribute(TableAttributes.id, "id");
+		this.setAttribute(TableAttributes.name, "name");
+	}
+	
 	/**
 	 * Creates a TableElement initialized with a HiveMetastore Table Metadata
 	 * @param table a HiveMetastore Table object

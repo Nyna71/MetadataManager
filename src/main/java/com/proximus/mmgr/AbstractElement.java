@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.util.EnumMap;
 import java.util.Map;
 
+import org.apache.commons.lang.NullArgumentException;
+
 /**
  * A metadata Element part of an Informatica Metadata Manager custom model. A custom model is a collection of Elements
  * organized in a hierarchy.<br>
@@ -25,7 +27,7 @@ import java.util.Map;
  * <b>folder1.folder2.script1</b>.
  * 
  * @author Jonathan Puvilland
- * @param <E>
+ * @param <AttributeType> An enumeation of the attributes applicable to the element
  */
 public abstract class AbstractElement <AttributeType extends Enum<AttributeType>> implements ElementWritable {
 	
@@ -33,10 +35,9 @@ public abstract class AbstractElement <AttributeType extends Enum<AttributeType>
     private Map<AttributeType, String> attributes;
 	
 	/**
-	 * Creates a pre-polulated Element with an identifier, name and type
-	 * @param id a unique identifier of the Element across the complete model
-	 * @param name the name of Element
-	 * @param type the type of Element as specified in the Informatica Metadata Manager model <i>load template</i>.
+	 * Initializes the Map structure for storing the Element's attributes key-value pairs.
+	 * The keys or attribute names must be listed in an enumeration type <i>AttributeType</i>.
+	 * A default enumeration of attributes is available in the <i>DefaultElementAttributes</i> interface.
 	 */
     public AbstractElement(Class<AttributeType> attrType) {
     	this.separator = DEFAULT_SEPARATOR;
@@ -44,7 +45,7 @@ public abstract class AbstractElement <AttributeType extends Enum<AttributeType>
     }
 
 	/**
-	 * Retrieves the Element's attributes separator
+	 * Retrieves the Element's attributes separator.
 	 * @return the separator used to separate the Element's attribute.
 	 */
 	public char getSeparator() {
@@ -52,33 +53,49 @@ public abstract class AbstractElement <AttributeType extends Enum<AttributeType>
 	}
 	
 	/**
-	 * Sets the Element's attributes separator
+	 * Sets the Element's attributes separator.
 	 * @param separator the separator used to separate the Element's attribute.
 	 */
 	public void setSeparator(char separator) {
 		this.separator = separator;
 	}
 	
+	/**
+	 * Returns the attributes value specified by the attribute name.
+	 * @param attrName the name of the attribute from the Element's type enumeration.
+	 * @return the attribute value.
+	 */
     public String getAttribute(AttributeType attrName) {
         return this.attributes.get(attrName);
     }
     
-    public void setAttribute(AttributeType attrName, String attrValue) {
+    /**
+     * Sets the value of an attribute.
+     * @param attrName the name of the attribute from the Element's type enumeration.
+     * @param attrValue the value to set for the attribute.
+     * @throws NullArgumentException <b>id</b> and <b>name</b> attributes are mandatory and cannot be set to null. Raises
+     * an exception if attribute id or name is not defined properly.
+     */
+    public void setAttribute(AttributeType attrName, String attrValue) throws NullArgumentException{
 
     	if((attrName.toString() == "id" || attrName.toString() == "name") &&
     	   (attrValue == null || attrValue.isEmpty()))
-				throw new NullPointerException();
+				throw new NullArgumentException(attrName.toString());
 
 		this.attributes.put(attrName, attrValue);
 	}
     
+    /**
+     * Returns the list of all the attributes in the form of a key-value pair.
+     * @return the list of attributes.
+     */
     public Map<AttributeType, String> getAttributes() {
     	return this.attributes;
     }
 	
 	/**
-	 * Retrieves the Element's attributes header
-	 * @return a formated string of the Element's attributes name separated by the object separator.
+	 * Retrieves the Element's attributes name.
+	 * @return a formated string of the Element's attributes name separated by the Element separator.
 	 */
 	public String getHeader() {
 		StringBuilder header = new StringBuilder();
@@ -92,8 +109,9 @@ public abstract class AbstractElement <AttributeType extends Enum<AttributeType>
 	}
 
 	/**
-	 * Retrieves the Element's attributes value
-	 * @return a formated string of the Element's attributes value separated by the object separator.
+	 * Retrieves the Element's attributes value. Replaces null values by empty string. Surrounds values with hyphen
+	 * when value contains the Element separator.
+	 * @return a formated string of the Element's attributes value separated by the Element separator.
 	 */
 	public String getRecord() {
 		StringBuilder record = new StringBuilder();

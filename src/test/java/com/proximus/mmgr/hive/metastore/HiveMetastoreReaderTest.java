@@ -49,4 +49,14 @@ public class HiveMetastoreReaderTest {
 		metastoreReaderProperties = HiveMetastoreReader.getMetastoreReaderProperties(metastoreReaderConfig);
 		HiveMetastoreReader.getHiveConfiguration(metastoreReaderProperties);
 	}
+	
+	@Test(expected = InvalidParameterException.class)
+	public void valWrongAuthenticationMethod() throws Exception {
+		LogManager.getLogManager().reset();
+		Properties metastoreReaderProperties = new Properties();
+		File metastoreReaderConfig = new File("src/test/resources/wrongAuthenticationMethod.xml");
+		metastoreReaderProperties = HiveMetastoreReader.getMetastoreReaderProperties(metastoreReaderConfig);
+		System.out.println(metastoreReaderProperties.getProperty("authentication_method"));
+		HiveMetastoreReader.checkMetastoreReaderProperties(metastoreReaderProperties);
+	}
 }

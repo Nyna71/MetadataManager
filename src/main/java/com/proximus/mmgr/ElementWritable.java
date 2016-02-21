@@ -17,26 +17,26 @@ public interface ElementWritable {
 	public static final String HYPHEN_ESCAPE = "\"";
 	
 	/**
-	 * Generates a Metadata Element's attributes header (labels)
-	 * @return a csv formatted string of Metadata Element's attributes header (labels)
+	 * Generates a record of the Element attributes name (header)
+	 * @return a csv formatted string of Metadata Element's attributes names (header)
 	 */
 	public String getHeader();
 	
 	/**
-	 * Generates a Metadata Element's attributes value
+	 * Generates a record of the Element attributes value
 	 * @return a csv formatted string of Metadata Element's attributes value
 	 */
 	public String getRecord();
 	
 	/**
-	 * Writes a Metadata Element's attributes header (labels) to the specified file
+	 * Writes a a record of the Element's attributes name (header) to the specified file
 	 * @param buffer the buffer wrapping the destination file
 	 * @throws IOException in case of any IO failure when writing to the destination file
 	 */
 	public void writeHeader(BufferedWriter buffer) throws IOException;
 
 	/**
-	 * Writes a Metadata Element's attributes value to the specified file
+	 * Writes a record of the Element's attributes value to the specified file
 	 * @param buffer the buffer wrapping the destination file
 	 * @throws IOException in case of any IO failure when writing to the destination file
 	 */

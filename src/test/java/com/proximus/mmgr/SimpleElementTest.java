@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import org.apache.commons.lang.NullArgumentException;
 import org.junit.Test;
 
 import com.proximus.mmgr.DefaultElementAttributes.DefaultAttributes;
@@ -29,7 +30,7 @@ public class SimpleElementTest {
 
 
 	
-	@Test(expected = NullPointerException.class)
+	@Test(expected = NullArgumentException.class)
 	public void valEmptyOrNullAttributes() {
 		SimpleElement elem1 = new SimpleElement(null, null, null, null, null);
 		elem1.setAttribute(DefaultAttributes.id, null);

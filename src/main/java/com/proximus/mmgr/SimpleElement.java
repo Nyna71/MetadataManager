@@ -2,6 +2,14 @@ package com.proximus.mmgr;
 
 import com.proximus.mmgr.DefaultElementAttributes.DefaultAttributes;
 
+/**
+ * A class that defines a simple Metadata Element, with a few attributes. The list of attributes is declared
+ * in the <i>DefaultAttributes</i> interface. All the Element's manipulation methods are inherited from the
+ * <i>AbstractElement</i> parent class.
+ * Offers various constructors for creating a simple Element.
+ * @author Jonathan Puvilland
+ *
+ */
 public class SimpleElement extends AbstractElement<DefaultAttributes> {
 
 	public SimpleElement(String id, String name) {

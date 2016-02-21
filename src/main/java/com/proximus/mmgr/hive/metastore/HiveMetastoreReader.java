@@ -16,7 +16,6 @@ import java.util.logging.SimpleFormatter;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
-import org.apache.hadoop.hive.metastore.api.Database;
 import org.apache.hadoop.hive.metastore.api.FieldSchema;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.api.StorageDescriptor;
@@ -27,12 +26,15 @@ import org.apache.hadoop.security.UserGroupInformation;
 /**
  * Reads the Hive Metastore repository using the Hive Metastore api, and exports Hive Metadata into a set of
  * csv files ready to be uploaded in Informatica Metadata Manager.
+ * The program support Kerberos authentication through keytab file or ticket. Authentication type is configurable
+ * in a Java properties xml file. See readme file for more details.
  * @author Jonathan Puvilland
  *
  */
 public class HiveMetastoreReader {
 	private static final String KEYTAB_AUTHENTICATION_METHOD = "keytab";
 	private static final String TICKET_AUTHENTICATION_METHOD = "ticket";
+	private static final String NO_AUTHENTICATION_METHOD = "none";
 	private static final String PROPERTIES_FILE = "./etc/HiveMetastoreConfig.xml";
 	private static final Logger logger = Logger.getLogger(HiveMetastoreReader.class.getName());
 	private static FileHandler logFileHandler;
@@ -41,13 +43,13 @@ public class HiveMetastoreReader {
 	 * Reads the HiveMetastoreReader configuration file, connects to the HiveMetastore and exports Hive Metadata
 	 * to a set of csv files 
 	 * @param args not used
-	 * @throws Exception
 	 */
 	public static void main(String[] args) 
 	{
 		HiveMetastoreReader thisReader = new HiveMetastoreReader();
 		Properties metastoreReaderProperties = new Properties();
 		
+		//Read the program configuration file
 		try {
 			File metastoreReaderConfig = new File(PROPERTIES_FILE);
 			metastoreReaderProperties = getMetastoreReaderProperties(metastoreReaderConfig);
@@ -65,6 +67,7 @@ public class HiveMetastoreReader {
 		
 		MetadataBufferedWriters bufferedWriters = thisReader.new MetadataBufferedWriters(metastoreReaderProperties);
 
+		//Read hive-site configuration and creates a hive metastore client
 		try {
 			HiveMetaStoreClient hiveClient = new HiveMetaStoreClient(getHiveConfiguration(metastoreReaderProperties));
 			exportheaders(bufferedWriters);
@@ -86,7 +89,7 @@ public class HiveMetastoreReader {
 	 * files location.
 	 * @param readerConfiguration a HiveMetastoreReader xml configuration file
 	 * @return HiveMetastoreReader runtime configuration parameters or null if configuration file is not found
-	 * @throws IOException 
+	 * @throws IOException when configuration file cannot be read.
 	 */
 	static Properties getMetastoreReaderProperties (File readerConfiguration) throws IOException 
 	{
@@ -104,6 +107,16 @@ public class HiveMetastoreReader {
 		return metastoreReaderProperties;
 	}
 
+	/**
+	 * Check for mandatory properties in the configuration file, namely:
+	 * <br>- <b>hive_conf_home</b>: the folder location of hadoop hive configuration file.
+	 * <br>- <b>hive_cong_file</b>: the name of the hive configuration file (ex. hive-site.xml).
+	 * <br>- <b>authentication_method</b>: the hive metastore authentication method. Possible values are
+	 * <i>none, ticket or keytab</i>.
+	 * <br>If one of those properties is not defined, an exception is thrown and the program stops.
+	 * @param hiveMetastoreProps
+	 * @throws InvalidParameterException
+	 */
 	static void checkMetastoreReaderProperties(Properties hiveMetastoreProps) throws InvalidParameterException {
 		if(!hiveMetastoreProps.containsKey("hive_conf_home"))
 			throw new InvalidParameterException("Property hive_conf_home is not set!");
@@ -113,6 +126,13 @@ public class HiveMetastoreReader {
 		
 		if(!hiveMetastoreProps.containsKey("authentication_method"))
 			throw new InvalidParameterException("Property authentication_method is not set!");
+		
+		String authenticationMethod = hiveMetastoreProps.getProperty("authentication_method");
+		
+		if(!authenticationMethod.equals(KEYTAB_AUTHENTICATION_METHOD) ||
+				!authenticationMethod.equals(TICKET_AUTHENTICATION_METHOD) ||
+				!authenticationMethod.equals(NO_AUTHENTICATION_METHOD))
+			throw new InvalidParameterException("Invalid authentication_method: " + authenticationMethod);
 	}
 	
 	/**
@@ -161,9 +181,12 @@ public class HiveMetastoreReader {
 						UserGroupInformation.getUGIFromTicketCache(ticket, ""));
 			}
 			
+			else if(authenticationMethod.equals(NO_AUTHENTICATION_METHOD))
+				logger.log(Level.INFO, "Logging in HiveMetastore without authentication");
+			
 			else {
 				logger.log(Level.SEVERE, "Authentication method undefined. Set authentication_method in configuration file " + 
-						"to keytab or ticket");
+						"to keytab, ticket or none");
 				return null;
 			}
 			
@@ -178,22 +201,13 @@ public class HiveMetastoreReader {
 	}
 	
 	/**
-	 * Writes the Header record to the Database, Table and Column output files.
+	 * Writes the Header records to the Database, Table and Column output files.
 	 * @param bufferedWriters the object managing the different file writers.
 	 */
 	private static void exportheaders(MetadataBufferedWriters bufferedWriters) {
-		Database db = new Database();
-		Table tbl = new Table();
-		FieldSchema col = new FieldSchema();
-		
-		db.setName("name");
-		tbl.setTableName("name");
-		tbl.setDbName("db");
-		col.setName("col");
-		
-		DatabaseElement dbElement = new DatabaseElement(db);
-		TableElement tableElement = new TableElement(tbl);
-		ColumnElement colElement = new ColumnElement(tbl, col);
+		DatabaseElement dbElement = new DatabaseElement();
+		TableElement tableElement = new TableElement();
+		ColumnElement colElement = new ColumnElement();
 		
 		try {
 			dbElement.writeHeader(bufferedWriters.getDatabaseBufferedWriter());

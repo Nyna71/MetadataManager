@@ -1,4 +1,0 @@
-févr. 19, 2016 4:53:26 PM com.proximus.mmgr.hive.metastore.HiveMetastoreReader getHiveConfiguration
-GRAVE: Cannot find Hive Configuration file: /usr/hdp/current/hive-server2/conf/no hive site
-févr. 19, 2016 4:53:26 PM com.proximus.mmgr.hive.metastore.HiveMetastoreReader getHiveConfiguration
-GRAVE: Specify correct location in ./etc/HiveMetastoreConfig.xml
