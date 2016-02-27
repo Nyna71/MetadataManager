@@ -1,15 +1,11 @@
 package com.proximus.mmgr.hive.metastore;
 
-import static org.junit.Assert.*;
-import static org.assertj.core.api.Assertions.contentOf;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
 import java.util.logging.LogManager;
 import java.security.InvalidParameterException;
 
-import org.apache.hadoop.hive.conf.HiveConf;
 import org.junit.Test;
 
 import com.proximus.mmgr.hive.metastore.HiveMetastoreReader;

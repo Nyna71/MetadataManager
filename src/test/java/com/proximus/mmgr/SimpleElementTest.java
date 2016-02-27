@@ -1,6 +1,7 @@
 package com.proximus.mmgr;
 
 import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -27,8 +28,6 @@ public class SimpleElementTest {
 		assertEquals(elem2.getAttribute(DefaultAttributes.parent), "parentId");
 		assertEquals(elem2.getAttribute(DefaultAttributes.type), "type");
 	}
-
-
 	
 	@Test(expected = NullArgumentException.class)
 	public void valEmptyOrNullAttributes() {
@@ -56,18 +55,24 @@ public class SimpleElementTest {
 
 	@Test
 	public void valExportFile() {
-		SimpleElement elem1 = new SimpleElement("id", "name", "description", "parent", "S");
-		SimpleElement elem2 = new SimpleElement("id", "name", "S");
+		SimpleElement elem1 = new SimpleElement("elem1", "element", "my element", "parent", "S");
 		File file = new File("src/test/resources/elements.csv");
+		
+	    assertThat(file).exists().isFile().isRelative();
+	    assertThat(file).canRead().canWrite();
+	    
 		try {
 			BufferedWriter out = new BufferedWriter(new FileWriter(file));
 			elem1.writeHeader(out);
 			elem1.writeRecord(out);
-			elem2.writeRecord(out);
 			out.close();
 		} catch (IOException e) {
 			e.printStackTrace();
-		} 
+		}
+		
+		assertThat(file).hasContent("type,id,name,description,parent\n" +
+			"S,elem1,element,my element,parent\n");
+		
 	}
 
 	@Test

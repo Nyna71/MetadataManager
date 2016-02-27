@@ -91,7 +91,7 @@ public class HiveMetastoreReader {
 	 * @return HiveMetastoreReader runtime configuration parameters or null if configuration file is not found
 	 * @throws IOException when configuration file cannot be read.
 	 */
-	static Properties getMetastoreReaderProperties (File readerConfiguration) throws IOException 
+	protected static Properties getMetastoreReaderProperties (File readerConfiguration) throws IOException 
 	{
 		Properties metastoreReaderProperties = new Properties();
 		
@@ -114,10 +114,10 @@ public class HiveMetastoreReader {
 	 * <br>- <b>authentication_method</b>: the hive metastore authentication method. Possible values are
 	 * <i>none, ticket or keytab</i>.
 	 * <br>If one of those properties is not defined, an exception is thrown and the program stops.
-	 * @param hiveMetastoreProps
-	 * @throws InvalidParameterException
+	 * @param hiveMetastoreProps the properties of the HiveMetatstoreReader program.
+	 * @throws InvalidParameterException when mandatory properties are not set in the configuration file.
 	 */
-	static void checkMetastoreReaderProperties(Properties hiveMetastoreProps) throws InvalidParameterException {
+	protected static void checkMetastoreReaderProperties(Properties hiveMetastoreProps) throws InvalidParameterException {
 		if(!hiveMetastoreProps.containsKey("hive_conf_home"))
 			throw new InvalidParameterException("Property hive_conf_home is not set!");
 		
@@ -140,7 +140,7 @@ public class HiveMetastoreReader {
 	 * @param hiveMetastoreProps a set of properties for accessing the HiveMetastore and exporting metadata
 	 * @return a HiveConfiguration object for getting access to the HiveMetastore api.
 	 */
-	static HiveConf getHiveConfiguration(Properties hiveMetastoreProps) throws InvalidParameterException
+	protected static HiveConf getHiveConfiguration(Properties hiveMetastoreProps) throws InvalidParameterException
 	{		
 		String authenticationMethod= hiveMetastoreProps.getProperty("authentication_method");
 		String hiveConfFile = hiveMetastoreProps.getProperty("hive_conf_home") + 
@@ -181,6 +181,7 @@ public class HiveMetastoreReader {
 						UserGroupInformation.getUGIFromTicketCache(ticket, ""));
 			}
 			
+			// No authentication
 			else if(authenticationMethod.equals(NO_AUTHENTICATION_METHOD))
 				logger.log(Level.INFO, "Logging in HiveMetastore without authentication");
 			
@@ -232,7 +233,6 @@ public class HiveMetastoreReader {
 	 * Writes the Hive Databases Metadata to the Databases output file.
 	 * @param hiveClient the Hive Client session handler
 	 * @param bufferedWriters the object managing the different file writers.
-	 * @throws TException Thrift exception
 	 */
 	private static void exportDatabases(HiveMetaStoreClient hiveClient,
 			MetadataBufferedWriters bufferedWriters)
@@ -261,7 +261,6 @@ public class HiveMetastoreReader {
 	 * @param hiveClient the Hive Client session handler
 	 * @param bufferedWriters the object managing the different file writers.
 	 * @param dbName the name of the Database holding the Tables to export 
-	 * @throws TException Thrift exception
 	 */
 	private static void exportTables(HiveMetaStoreClient hiveClient, MetadataBufferedWriters bufferedWriters,
 			String dbName)
@@ -324,7 +323,7 @@ public class HiveMetastoreReader {
 	 * @author Jonathan Puvilland
 	 *
 	 */
-	 class MetadataBufferedWriters {
+	 private class MetadataBufferedWriters {
 		private BufferedWriter databaseBuffer;
 		private BufferedWriter tableBuffer;
 		private BufferedWriter columnBuffer;
@@ -406,19 +405,19 @@ public class HiveMetastoreReader {
 			}
 		}
 		
-		BufferedWriter getDatabaseBufferedWriter() {
+		private BufferedWriter getDatabaseBufferedWriter() {
 			return databaseBuffer;
 		}
 		
-		BufferedWriter getTableBufferedWriter() {
+		private BufferedWriter getTableBufferedWriter() {
 			return tableBuffer;
 		}
 		
-		BufferedWriter getColumnBufferedWriter() {
+		private BufferedWriter getColumnBufferedWriter() {
 			return columnBuffer;
 		}
 		
-		void closeBufferedWriters() {
+		private void closeBufferedWriters() {
 			try {
 				databaseBuffer.close();
 				tableBuffer.close();

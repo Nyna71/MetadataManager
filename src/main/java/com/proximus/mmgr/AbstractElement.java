@@ -38,6 +38,7 @@ public abstract class AbstractElement <AttributeType extends Enum<AttributeType>
 	 * Initializes the Map structure for storing the Element's attributes key-value pairs.
 	 * The keys or attribute names must be listed in an enumeration type <i>AttributeType</i>.
 	 * A default enumeration of attributes is available in the <i>DefaultElementAttributes</i> interface.
+	 * @param attrType the enumeration class holding the attributes of the element
 	 */
     public AbstractElement(Class<AttributeType> attrType) {
     	this.separator = DEFAULT_SEPARATOR;

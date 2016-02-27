@@ -1,3 +1,2 @@
 type,id,name,description,parent
-S,id,name,description,parent
-S,id,name,,
+S,elem1,element,my element,parent
